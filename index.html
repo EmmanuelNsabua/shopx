@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3b4cca">
+<title>Ma liste de courses</title>
+<style>
+:root{--bg:#edeff7;--card:#fff;--soft:#f1f2f9;--ink:#171b33;--mute:#7a7f9c;--acc:#3b4cca;--on:#fff;--gold:#f5b83d;--warn:#e0533d;--sh:0 10px 30px rgba(40,50,110,.08)}
+@media(prefers-color-scheme:dark){:root{--bg:#10121f;--card:#1a1d31;--soft:#23273f;--ink:#eceefb;--mute:#8d92b3;--acc:#6f7dff;--on:#0e1020;--sh:0 10px 30px rgba(0,0,0,.4)}}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink)}
+body{padding:calc(env(safe-area-inset-top,0px) + 18px) 16px calc(env(safe-area-inset-bottom,0px) + 40px);max-width:560px;margin:0 auto}
+button,input,select{border:0;outline:0;background:none;color:inherit;font-size:16px}
+button{cursor:pointer}
+.top{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.chips{display:flex;gap:8px;overflow-x:auto;flex:1;padding:2px 0;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:10px 16px;border-radius:99px;background:var(--card);color:var(--mute);font-weight:600;font-size:14px;box-shadow:var(--sh)}
+.chip.on{background:var(--acc);color:var(--on)}
+.cur{flex:none;background:var(--card);border-radius:99px;padding:10px 12px;font-weight:700;font-size:14px;box-shadow:var(--sh);appearance:none;text-align:center}
+.name{width:100%;font-size:28px;font-weight:800;letter-spacing:-.02em;padding:6px 2px;margin-bottom:12px}
+.hero{background:var(--acc);color:var(--on);border-radius:28px;padding:22px 22px 20px;box-shadow:var(--sh)}
+.hero small{opacity:.8;font-size:14px}
+.big{font-size:44px;font-weight:800;letter-spacing:-.03em;line-height:1.1;margin:4px 0 16px}
+.bar{height:10px;border-radius:9px;background:rgba(255,255,255,.25);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:9px;background:var(--gold);transition:width .35s}
+.bar.over i{background:var(--warn)}
+.alert{font-size:13px;margin-top:10px;opacity:.95;min-height:18px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 18px}
+.tile{background:var(--card);border-radius:20px;padding:14px;box-shadow:var(--sh);min-width:0}
+.tile small{display:block;color:var(--mute);font-size:12px;margin-bottom:4px}
+.tile b{font-size:15px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile input{width:100%;font-weight:700;font-size:15px;background:var(--soft);border-radius:10px;padding:6px 8px;margin-top:2px}
+.tile.rest b.neg{color:var(--warn)}
+form{background:var(--card);border-radius:24px;padding:12px;box-shadow:var(--sh);display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+form input{background:var(--soft);border-radius:14px;padding:13px 14px;width:100%;min-width:0}
+form input::placeholder{color:var(--mute)}
+form .full{grid-column:1/-1}
+.add{grid-column:1/-1;background:var(--acc);color:var(--on);border-radius:14px;padding:13px;font-weight:700}
+.add:active{transform:scale(.98)}
+.items{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:20px;padding:12px 12px 12px 14px;box-shadow:var(--sh)}
+.tick{flex:none;width:28px;height:28px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:transparent;font-size:15px;font-weight:800;transition:.2s}
+.item.done .tick{background:var(--acc);color:var(--on)}
+.info{flex:1;min-width:0;cursor:pointer}
+.info b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.info span{font-size:13px;color:var(--mute)}
+.item.done .info b{text-decoration:line-through;color:var(--mute)}
+.sum{font-weight:700;font-size:15px;white-space:nowrap}
+.item.done .sum{color:var(--mute)}
+.del{flex:none;width:32px;height:32px;border-radius:50%;color:var(--mute);font-size:20px;line-height:1}
+.del:active{background:var(--soft)}
+.empty{text-align:center;color:var(--mute);padding:30px 10px;font-size:15px}
+.foot{display:flex;justify-content:center;margin-top:22px}
+.rm{color:var(--mute);font-size:14px;padding:10px 16px;border-radius:99px}
+.rm:active{background:var(--card)}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="chips" id="chips"></div>
+    <select class="cur" id="cur" aria-label="Devise"><option>$</option><option>FC</option><option>€</option></select>
+    </div>
+    <input class="name" id="name" placeholder="Nom de la liste" aria-label="Nom de la liste">
+
+<div class="hero">
+      <small>Dépensé (articles cochés)</small>
+        <div class="big" id="spent">0 $</div>
+          <div class="bar" id="bar"><i></i></div>
+            <div class="alert" id="alert"></div>
+            </div>
+
+            <div class="tiles">
+              <div class="tile"><small>Budget</small><input id="budget" type="number" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+                <div class="tile"><small>Total prévu</small><b id="planned">0</b></div>
+                  <div class="tile rest"><small>Reste</small><b id="rest">0</b></div>
+                  </div>
+
+                  <form id="f" autocomplete="off">
+                    <input class="full" id="iname" placeholder="Ajouter un article (ex. Riz 5 kg)" required>
+                      <input id="iqty" type="number" inputmode="decimal" min="0" step="any" value="1" aria-label="Quantité" placeholder="Quantité">
+                        <input id="iprice" type="number" inputmode="decimal" min="0" step="any" aria-label="Prix unitaire" placeholder="Prix unitaire">
+                          <button class="add" type="submit">Ajouter à la liste</button>
+                          </form>
+
+                          <div class="items" id="items"></div>
+                          <div class="foot"><button class="rm" id="rm">Supprimer cette liste</button></div>
+
+                          <script>
+                          const K='liste-courses-v1';
+                          let S=null;
+                          try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
+                          if(!S||!Array.isArray(S.lists)||!S.lists.length){
+                            const id=Date.now();S={lists:[{id,name:'Mes courses',budget:0,items:[]}],cur:id,sym:'$'};
+                            }
+                            const $=i=>document.getElementById(i);
+                            const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+                            const L=()=>S.lists.find(l=>l.id===S.cur)||S.lists[0];
+                            const num=v=>{const n=parseFloat(String(v).replace(',','.'));return isFinite(n)&&n>0?n:0};
+                            const fmt=n=>n.toLocaleString('fr-FR',{maximumFractionDigits:2})+' '+S.sym;
+                            const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+                            function chips(){
+                              $('chips').innerHTML=S.lists.map(l=>`<button class="chip${l.id===L().id?' on':''}" data-id="${l.id}">${esc(l.name||'Sans titre')}</button>`).join('')+'<button class="chip" data-new="1">+ Nouvelle liste</button>';
+                              }
+                              function stats(){
+                                const l=L();let planned=0,spent=0;
+                                  l.items.forEach(i=>{const t=i.qty*i.price;planned+=t;if(i.done)spent+=t});
+                                    $('spent').textContent=fmt(spent);
+                                      $('planned').textContent=fmt(planned);
+                                        const rest=l.budget-spent;
+                                          const r=$('rest');r.textContent=l.budget?fmt(rest):'—';r.className=rest<0&&l.budget?'neg':'';
+                                            const pct=l.budget?Math.min(100,spent/l.budget*100):0;
+                                              $('bar').firstElementChild.style.width=pct+'%';
+                                                $('bar').className='bar'+(l.budget&&spent>l.budget?' over':'');
+                                                  let a='';
+                                                    if(!l.budget)a='Renseigne un budget pour suivre ta dépense.';
+                                                      else if(spent>l.budget)a='Tu dépasses le budget de '+fmt(spent-l.budget)+'.';
+                                                        else if(planned>l.budget)a='La liste prévue dépasse le budget de '+fmt(planned-l.budget)+'.';
+                                                          else a=Math.round(pct)+' % du budget dépensé.';
+                                                            $('alert').textContent=a;
+                                                            }
+                                                            function items(){
+                                                              const l=L();
+                                                                $('items').innerHTML=l.items.length?l.items.map(i=>`<div class="item${i.done?' done':''}" data-id="${i.id}">
+                                                                    <button class="tick" data-act="tick" aria-label="Cocher">✓</button>
+                                                                        <div class="info" data-act="tick"><b>${esc(i.name)}</b><span>${i.qty.toLocaleString('fr-FR')} × ${fmt(i.price)}</span></div>
+                                                                            <div class="sum">${fmt(i.qty*i.price)}</div>
+                                                                                <button class="del" data-act="del" aria-label="Supprimer">×</button></div>`).join('')
+                                                                                  :'<div class="empty">Cette liste est vide. Ajoute ton premier article ci-dessus.</div>';
+                                                                                  }
+                                                                                  function all(){
+                                                                                    const l=L();
+                                                                                      chips();$('name').value=l.name;$('budget').value=l.budget||'';$('cur').value=S.sym;
+                                                                                        items();stats();
+                                                                                        }
+
+                                                                                        $('chips').onclick=e=>{
+                                                                                          const b=e.target.closest('button');if(!b)return;
+                                                                                            if(b.dataset.new){const id=Date.now();S.lists.push({id,name:'Nouvelle liste',budget:0,items:[]});S.cur=id;save();all();$('name').focus();$('name').select();return}
+                                                                                              S.cur=+b.dataset.id;save();all();
+                                                                                              };
+                                                                                              $('name').oninput=e=>{L().name=e.target.value;save()};
+                                                                                              $('name').onchange=chips;
+                                                                                              $('budget').oninput=e=>{L().budget=num(e.target.value);save();stats()};
+                                                                                              $('cur').onchange=e=>{S.sym=e.target.value;save();all()};
+                                                                                              $('f').onsubmit=e=>{
+                                                                                                e.preventDefault();
+                                                                                                  const n=$('iname').value.trim();if(!n)return;
+                                                                                                    L().items.push({id:Date.now(),name:n,qty:num($('iqty').value)||1,price:num($('iprice').value),done:false});
+                                                                                                      save();$('iname').value='';$('iprice').value='';$('iqty').value=1;$('iname').focus();items();stats();
+                                                                                                      };
+                                                                                                      $('items').onclick=e=>{
+                                                                                                        const a=e.target.closest('[data-act]');if(!a)return;
+                                                                                                          const row=a.closest('.item'),l=L(),id=+row.dataset.id;
+                                                                                                            if(a.dataset.act==='tick'){const i=l.items.find(x=>x.id===id);i.done=!i.done}
+                                                                                                              else l.items=l.items.filter(x=>x.id!==id);
+                                                                                                                save();items();stats();
+                                                                                                                };
+                                                                                                                $('rm').onclick=()=>{
+                                                                                                                  if(!confirm('Supprimer la liste « '+L().name+' » ?'))return;
+                                                                                                                    S.lists=S.lists.filter(l=>l.id!==S.cur);
+                                                                                                                      if(!S.lists.length){const id=Date.now();S.lists.push({id,name:'Mes courses',budget:0,items:[]})}
+                                                                                                                        S.cur=S.lists[0].id;save();all();
+                                                                                                                        };
+                                                                                                                        all();
+                                                                                                                        </script>
+                                                                                                                        </body>
+                                                                                                                        </html>
