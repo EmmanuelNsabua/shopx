@@ -1,0 +1,26 @@
+{
+  "name": "Shopx Flame",
+  "short_name": "Shopx",
+  "description": "Gestion simple de liste de courses avec budget et suivi des achats.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#edeff7",
+  "theme_color": "#3b4cca",
+  "orientation": "portrait",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
